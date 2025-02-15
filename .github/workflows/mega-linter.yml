@@ -41,6 +41,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
         with:
+          token: ${{ secrets.PAT  }}
           fetch-depth: 0
 
       - name: Install Node.js
