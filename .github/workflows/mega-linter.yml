@@ -35,7 +35,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -73,35 +73,9 @@ jobs:
         # All available variables are described in documentation
         # https://megalinter.io/latest/config-file/
         env:
-          # Validates all source when push on main, else just the git diff with
-          # main. Override with true if you always want to lint all sources
-          #
-          # To validate the entire codebase, set to:
-          # VALIDATE_ALL_CODEBASE: true
-          #
-          # To validate only diff with main, set to:
-          # VALIDATE_ALL_CODEBASE: >-
-          #   ${{
-          #     github.event_name == 'push' &&
-          #     github.ref == 'refs/heads/main'
-          #   }}
           VALIDATE_ALL_CODEBASE: >-
-            ${{              github.event_name == 'push' &&              github.ref == 'refs/heads/main'            }}
-
+            ${{ github.event_name == 'push' &&  github.ref == 'refs/heads/main' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          # Uncomment to use ApiReporter (Grafana)
-          # API_REPORTER: true
-          # API_REPORTER_URL: ${{ secrets.API_REPORTER_URL }}
-          # API_REPORTER_BASIC_AUTH_USERNAME: ${{ secrets.API_REPORTER_BASIC_AUTH_USERNAME }}
-          # API_REPORTER_BASIC_AUTH_PASSWORD: ${{ secrets.API_REPORTER_BASIC_AUTH_PASSWORD }}
-          # API_REPORTER_METRICS_URL: ${{ secrets.API_REPORTER_METRICS_URL }}
-          # API_REPORTER_METRICS_BASIC_AUTH_USERNAME: ${{ secrets.API_REPORTER_METRICS_BASIC_AUTH_USERNAME }}
-          # API_REPORTER_METRICS_BASIC_AUTH_PASSWORD: ${{ secrets.API_REPORTER_METRICS_BASIC_AUTH_PASSWORD }}
-          # API_REPORTER_DEBUG: false
-
-          # ADD YOUR CUSTOM ENV VARIABLES HERE TO OVERRIDE VALUES OF
-          # .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
 
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
@@ -117,7 +91,7 @@ jobs:
       # Create pull request if applicable
       # (for now works only on PR from same repository, not from forks)
       - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@67ccf781d68cd99b580ae25a5c18a1cc84ffff1f # v7.0.6
         id: cpr
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
@@ -173,7 +147,7 @@ jobs:
         run: sudo chown -Rc $UID .git/
 
       - name: Commit and push applied linter fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@e348103e9026cc0eee72ae06630dbe30c8bf7a79 # v5.1.0
         if: >-
           steps.ml.outputs.has_updated_sources == 1 &&
           (
@@ -188,12 +162,7 @@ jobs:
           ) &&
           !contains(github.event.head_commit.message, 'skip fix')
         with:
-          branch: >-
-            ${{
-              github.event.pull_request.head.ref ||
-              github.head_ref ||
-              github.ref
-            }}
+          branch: ${{ github.head_ref || github.ref }}
           commit_message: "[MegaLinter] Apply linters fixes"
           commit_user_name: megalinter-bot
           commit_user_email: nicolas.vuillamy@ox.security
