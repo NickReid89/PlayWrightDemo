@@ -12,15 +12,39 @@ APPLY_FIXES: all
 
 # If you use ENABLE_LINTERS variable, all other linters will be disabled by
 # default
-# ENABLE_LINTERS:
+ENABLE_LINTERS:
+  [
+    TYPESCRIPT_ES,
+    REPOSITORY_SECRETLINT,
+    REPOSITORY_GITLEAKS,
+    COPYPASTE_JSCPD,
+    SPELL_CSPELL,
+    JSON_JSONLINT,
+    YAML_PRETTIER,
+  ]
 
-DISABLE:
-  - COPYPASTE # Comment to enable checks of excessive copy-pastes
-  - SPELL # Comment to enable checks of spelling mistakes
+TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.js
+TYPESCRIPT_ES_ARGUMENTS: --fix
 
-SHOW_ELAPSED_TIME: true
+# DISABLE:
+# - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
+# - SPELL # Uncomment to disable checks of spelling mistakes
+
+SHOW_ELAPSED_TIME: false
 
 FILEIO_REPORTER: false
-
 # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 # DISABLE_ERRORS: true
+
+# All available cores are used by default. If there are too many, you need
+# to decrease the number of used cores in order to enhance performances
+PARALLEL_PROCESS_NUMBER: 1
+
+# When set to false, only new or edited files will be parsed for validation.
+VALIDATE_ALL_CODEBASE: false
+
+DISABLE_ERRORS_LINTERS:
+  - COPYPASTE_JSCPD
+  - SPELL_CSPELL
+
+PRINT_ALPACA: false
