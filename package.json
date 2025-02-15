@@ -20,6 +20,7 @@
     "@types/node": "^22.13.4"
   },
   "dependencies": {
+    "@estruyf/github-actions-reporter": "^1.10.0",
     "faker": "^5.5.3"
   }
 }
