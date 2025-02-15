@@ -133,8 +133,7 @@ test('Verify Random Date Picker is working', async ({ page }) => {
 
   test('Verify a random value between 1 and 25 (Inclusive) quantity for the Random Date Picker will throw an error', async ({ page }) => {
     const calendarPage = new RandomOrgCalendarPage(page)
-  //  //I need a random number between 1 and 25 inclusive
-  var quantityAmount = faker.random.number({ min: 1, max: 25 })
+    var quantityAmount = faker.datatype.number({ min: 1, max: 25 })
 
     await test.step('Set the amount of dates to generate', async () => {
       await calendarPage.setAmountOfDatesToGenerate(quantityAmount)
