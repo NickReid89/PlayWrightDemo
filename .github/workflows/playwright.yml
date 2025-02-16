@@ -22,17 +22,21 @@ jobs:
           node-version: 18
       - name: Install dependencies
         run: npm ci
-      - name: Cache Playwright Browsers
-        id: cache-playwright
+      - name: Cache browser binaries
+        id: playwright-cache
         uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+          path: /home/runner/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}-${{ inputs.browser }}
+      - name: Install Playwright
+        run: npm install @playwright/test@${{ env.PLAYWRIGHT_VERSION }}
       - name: Install Playwright Browsers
-        if: steps.cache-playwright.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps ${{ inputs.browser }}
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      - name: Install system dependencies for WebKit
+        # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
+        if: ${{ inputs.browser == 'webkit' && steps.playwright-cache.outputs.cache-hit == 'true' }}
+        run: npx playwright install-deps webkit
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v4
